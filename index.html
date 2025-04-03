@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ติดต่อ Supabase จาก Frontend</title>
+</head>
+<body>
+    <h1>ข้อมูลจาก Supabase</h1>
+    <div id="data-container">
+        </div>
+
+    <script>
+        // ขั้นตอนที่ 2: Initialize Supabase Client
+        const supabaseUrl = 'https://enmtxuazeffdewdbrjns.supabase.co'; // แทนที่ด้วย URL โครงการ Supabase ของคุณ
+        const supabaseApiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVubXR4dWF6ZWZmZGV3ZGJyam5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0MTIzNDQsImV4cCI6MjA1ODk4ODM0NH0.YlUMJjBvXAy74Grqa9n-Y1sEa2NSEdk2lRViANFDIyo'; // แทนที่ด้วย API Key แบบ anon public ของคุณ
+
+        const { createClient } = supabase;
+        const supabaseClient = createClient(supabaseUrl, supabaseApiKey);
+
+        // ขั้นตอนที่ 3: ฟังก์ชันสำหรับดึงข้อมูล
+        async function fetchData() {
+            const tableName = 'ER_patient_records'; // แทนที่ด้วยชื่อตารางที่คุณต้องการดึงข้อมูล
+            const dataContainer = document.getElementById('data-container');
+
+            const { data, error } = await supabaseClient
+                .from(tableName)
+                .select('*'); // เลือกทุกคอลัมน์
+
+            if (error) {
+                console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error);
+                dataContainer.innerText = 'เกิดข้อผิดพลาดในการโหลดข้อมูล';
+            } else if (data) {
+                console.log('ข้อมูลที่ดึงมา:', data);
+                // ขั้นตอนที่ 4: แสดงข้อมูล
+                displayData(data);
+            }
+        }
+
+        // ฟังก์ชันสำหรับแสดงข้อมูล (ตัวอย่างแสดงเป็นรายการ)
+        function displayData(data) {
+            const dataContainer = document.getElementById('data-container');
+            const ul = document.createElement('ul');
+
+            data.forEach(item => {
+                const li = document.createElement('li');
+                // ปรับเปลี่ยนการแสดงผลตามโครงสร้างข้อมูลของคุณ
+                let itemText = '';
+                for (const key in item) {
+                    itemText += `${key}: ${item[key]}, `;
+                }
+                li.textContent = itemText.slice(0, -2); // ตัด "," สุดท้ายออก
+                ul.appendChild(li);
+            });
+
+            dataContainer.appendChild(ul);
+        }
+
+        // เรียกฟังก์ชัน fetchData เมื่อหน้าเว็บโหลด
+        window.onload = fetchData;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</body>
+</html> 
